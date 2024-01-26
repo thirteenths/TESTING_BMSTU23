@@ -1,0 +1,6 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Wed Jan 24 15:29:00 MSK 2024","Wed Jan 24 15:29:00 MSK 2024","4","","EventServiceTestSuite","","","","TestGetAllEvent",""
+"passed","Wed Jan 24 15:29:00 MSK 2024","Wed Jan 24 15:29:00 MSK 2024","2","","EventServiceTestSuite","","","","TestGetEvent",""
+"passed","Wed Jan 24 15:29:00 MSK 2024","Wed Jan 24 15:29:00 MSK 2024","2","","EventServiceTestSuite","","","","TestUpdateEvent",""
+"passed","Wed Jan 24 15:29:00 MSK 2024","Wed Jan 24 15:29:00 MSK 2024","2","","EventServiceTestSuite","","","","TestDeleteEvent",""
+"passed","Wed Jan 24 15:29:00 MSK 2024","Wed Jan 24 15:29:00 MSK 2024","2","","EventServiceTestSuite","","","","TestCreateEvent",""
