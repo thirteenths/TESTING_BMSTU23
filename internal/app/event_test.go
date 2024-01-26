@@ -265,5 +265,6 @@ func (suite *EventServiceTestSuite) TestDeleteEvent(t provider.T) {
 }
 
 func TestSuiteRunner_EventService(t *testing.T) {
+	t.Setenv("ALLURE_OUTPUT_PATH", "../../")
 	suite.RunSuite(t, new(EventServiceTestSuite))
 }

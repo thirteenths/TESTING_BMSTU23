@@ -28,6 +28,10 @@ type EventRepositoryTestSuite struct {
 	repository *Postgres
 }
 
+func (suite *EventRepositoryTestSuite) BeforeAll(t provider.T) {
+	t.Setenv("ALLURE_OUTPUT_PATH", "../../")
+}
+
 func (suite *EventRepositoryTestSuite) BeforeEach(t provider.T) {
 	t.Epic("Data Access Layer")
 	t.Feature("BeforeEach")
@@ -285,5 +289,6 @@ func (suite *EventRepositoryTestSuite) TestDeleteEvent(t provider.T) {
 }
 
 func TestSuiteRunner_Event(t *testing.T) {
+	t.Setenv("ALLURE_OUTPUT_PATH", "../../../")
 	suite.RunSuite(t, new(EventRepositoryTestSuite))
 }
