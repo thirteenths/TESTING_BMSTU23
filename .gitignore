@@ -172,3 +172,8 @@ fabric.properties
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/go,goland,visualstudiocode,git
+
+./allure-report
+./allure-results
+
+./.idea
