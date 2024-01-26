@@ -1,6 +1,0 @@
-"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Sun Jan 21 18:28:06 MSK 2024","Sun Jan 21 18:28:06 MSK 2024","2","","EventRepositoryTestSuite","","","","TestUpdateEvent",""
-"passed","Sun Jan 21 18:28:06 MSK 2024","Sun Jan 21 18:28:06 MSK 2024","2","","EventRepositoryTestSuite","","","","TestCreateEvent",""
-"passed","Sun Jan 21 18:28:06 MSK 2024","Sun Jan 21 18:28:06 MSK 2024","1","","EventRepositoryTestSuite","","","","TestGetEvent",""
-"passed","Sun Jan 21 18:28:06 MSK 2024","Sun Jan 21 18:28:06 MSK 2024","1","","EventRepositoryTestSuite","","","","TestDeleteEvent",""
-"passed","Sun Jan 21 18:28:06 MSK 2024","Sun Jan 21 18:28:06 MSK 2024","1","","EventRepositoryTestSuite","","","","TestGetAllEvent",""
