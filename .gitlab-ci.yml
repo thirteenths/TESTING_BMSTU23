@@ -26,7 +26,7 @@ history_job: # Название job
     - docker # Пользуемся тем же самым раннером
   image: storytel/alpine-bash-curl # Но теперь укажем раннеру использовать другой образ, для того чтобы скачать результаты теста из предыдущего пайплайна. Нам же нужна история тестов, верно?
   script:
-    - 'curl --location --output artifacts.zip "https://(ВАШ ДОМЕН, например gitlab.example.com)/api/v4/projects/(АЙДИ ВАШЕГО РЕПОЗИТОРИЯ)/jobs/artifacts/master/download?job=pages&job_token=$CI_JOB_TOKEN"'  # С помощью api гитлаба скачиваем файлы из job, который будет указан ниже. Обратите внимание на текст на русском в ссылке. Очень важно указать вместо текста и скобок номер вашего репозиториия
+    - 'curl --location --output artifacts.zip "https://git.iu7.bmstu.ru/kvm18u916/testing_bmstu23/jobs/artifacts/master/download?job=pages&job_token=$CI_JOB_TOKEN"'  # С помощью api гитлаба скачиваем файлы из job, который будет указан ниже. Обратите внимание на текст на русском в ссылке. Очень важно указать вместо текста и скобок номер вашего репозиториия
     - apk add unzip # Образ, используемый в этом шаге по умолчанию не имеет утилиты unzip, по этой причине мы добавляем её в контейнер
     - unzip artifacts.zip # Распаковываем файлы
     - chmod -R 777 public # Даем права любые манипуляции с содержимым
