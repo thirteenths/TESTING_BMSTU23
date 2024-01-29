@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"errors"
 	_ "github.com/lib/pq"
 
 	"github.com/thirteenths/test-bmstu23/internal/domain"
@@ -32,14 +31,14 @@ func (p *Postgres) GetAllEvent() ([]domain.Event, error) {
 
 	rows, err := p.db.Query(getAllEventQuery)
 	if err != nil {
-		return []domain.Event{}, err
+		return nil, err
 	}
 
 	for rows.Next() {
 		var event domain.Event
 		err = rows.Scan(&event.ID, &event.Name, &event.Description, &event.Date)
 		if err != nil {
-			return []domain.Event{}, err
+			return nil, err
 		}
 		events = append(events, event)
 	}
@@ -83,16 +82,7 @@ func (p *Postgres) CreateEvent(event domain.Event) (int, error) {
 const deleteEventQuery = "DELETE FROM EVENTS WHERE ID=$1"
 
 func (p *Postgres) DeleteEvent(id int) error {
-	res, err := p.db.Exec(deleteEventQuery, id)
-	rowsAffected, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
-		return errors.New("error delete ")
-	}
-
+	_, err := p.db.Exec(deleteEventQuery, id)
 	return err
 }
 

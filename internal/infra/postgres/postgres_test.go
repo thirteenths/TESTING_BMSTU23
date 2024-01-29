@@ -8,9 +8,9 @@ import (
 	"github.com/ozontech/allure-go/pkg/framework/suite"
 	"github.com/sirupsen/logrus"
 	"testing"
-	"time"
 
 	"github.com/thirteenths/test-bmstu23/internal/domain"
+	"github.com/thirteenths/test-bmstu23/internal/infra/builder"
 )
 
 func NewMock() (*sql.DB, sqlmock.Sqlmock) {
@@ -28,10 +28,6 @@ type EventRepositoryTestSuite struct {
 	repository *Postgres
 }
 
-func (suite *EventRepositoryTestSuite) BeforeAll(t provider.T) {
-	t.Setenv("ALLURE_OUTPUT_PATH", "../../")
-}
-
 func (suite *EventRepositoryTestSuite) BeforeEach(t provider.T) {
 	t.Epic("Data Access Layer")
 	t.Feature("BeforeEach")
@@ -46,245 +42,339 @@ func (suite *EventRepositoryTestSuite) AfterEach(t provider.T) {
 	t.NewStep("AfterEach Step")
 }
 
-func (suite *EventRepositoryTestSuite) TestGetAllEvent(t provider.T) {
+func (suite *EventRepositoryTestSuite) TestGetAllEvent_OK(t provider.T) {
+	column := []string{"id", "name", "description", "date"}
+	query := "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS"
 	testCase := map[int]struct {
-		nameTest         string
-		column           []string
-		expectedResponse domain.Event
-		expectedError    error
-		Query            string
-		actualResponse   []domain.Event
-		actualError      error
+		nameTest       string
+		mockResponse   domain.Event
+		mockError      error
+		expectResponse []domain.Event
+		expectError    error
 	}{
 		1: {
-			nameTest:         "Test Ok",
-			column:           []string{"id", "name", "description", "date"},
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    nil,
-			Query:            getAllEventQuery,
-			actualResponse:   []domain.Event{{ID: 1, Name: "name", Description: "description", Date: time.Time{}}},
-			actualError:      nil,
+			nameTest:       "Test Ok",
+			mockResponse:   *builder.EventMother{}.Obj1(),
+			mockError:      nil,
+			expectResponse: []domain.Event{*builder.EventMother{}.Obj1()},
+			expectError:    nil,
 		},
 		2: {
-			nameTest:         "Test Ok empty response",
-			column:           []string{"id", "name", "description", "date"},
-			expectedResponse: domain.Event{},
-			expectedError:    nil,
-			Query:            getAllEventQuery,
-			actualResponse:   []domain.Event{{}},
-			actualError:      nil,
-		},
-		3: {
-			nameTest:         "Test Error",
-			column:           []string{"id", "name", "description", "date"},
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    errors.New("error postgres"),
-			Query:            getAllEventQuery,
-			actualResponse:   []domain.Event{},
-			actualError:      errors.New("error postgres"),
+			nameTest:       "Test Ok empty response",
+			mockResponse:   *builder.EventMother{}.Obj0(),
+			mockError:      nil,
+			expectResponse: []domain.Event{*builder.EventMother{}.Obj0()},
+			expectError:    nil,
 		},
 	}
 
 	for _, test := range testCase {
-		suite.mock.ExpectQuery(test.Query).
-			WillReturnRows(sqlmock.NewRows(test.column).
+		suite.mock.ExpectQuery(query).
+			WillReturnRows(sqlmock.NewRows(column).
 				AddRow(
-					test.expectedResponse.ID,
-					test.expectedResponse.Name,
-					test.expectedResponse.Description,
-					test.expectedResponse.Date,
+					test.mockResponse.ID,
+					test.mockResponse.Name,
+					test.mockResponse.Description,
+					test.mockResponse.Date,
 				))
 
 		resp, err := suite.repository.GetAllEvent()
 
 		t.Require().Nil(err)
 		t.Require().NotNil(resp)
+
+		t.Require().Equal(test.expectResponse, resp)
 	}
 }
 
-func (suite *EventRepositoryTestSuite) TestGetEvent(t provider.T) {
+func (suite *EventRepositoryTestSuite) TestGetAllEvent_Error(t provider.T) {
+	query := "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS"
 	testCase := map[int]struct {
-		nameTest         string
-		column           []string
-		expectedResponse domain.Event
-		expectedError    error
-		Query            string
-		actualResponse   domain.Event
-		actualError      error
+		nameTest       string
+		mockResponse   domain.Event
+		mockError      error
+		expectResponse []domain.Event
+		expectError    error
 	}{
-		1: {
-			nameTest:         "Test Ok",
-			column:           []string{"id", "name", "description", "date"},
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    nil,
-			Query:            "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS",
-			actualResponse:   domain.Event{ID: 1, Name: "name", Description: "description", Date: time.Time{}},
-			actualError:      nil,
-		},
-		2: {
-			nameTest:         "Test Ok empty response",
-			column:           []string{"id", "name", "description", "date"},
-			expectedResponse: domain.Event{},
-			expectedError:    nil,
-			Query:            "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS",
-			actualResponse:   domain.Event{},
-			actualError:      nil,
-		},
 		3: {
-			nameTest:         "Test Error",
-			column:           []string{"id", "name", "description", "date"},
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    errors.New("error postgres"),
-			Query:            "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS",
-			actualResponse:   domain.Event{},
-			actualError:      errors.New("error postgres"),
+			nameTest:       "Test Error",
+			mockResponse:   domain.Event{ID: 1, Name: "name", Description: "description"},
+			mockError:      errors.New("error postgres"),
+			expectResponse: nil,
+			expectError:    errors.New("error postgres"),
 		},
 	}
 
 	for _, test := range testCase {
-		suite.mock.ExpectQuery(test.Query).
-			WillReturnRows(sqlmock.NewRows(test.column).
+		suite.mock.ExpectQuery(query).WillReturnError(test.expectError)
+
+		resp, err := suite.repository.GetAllEvent()
+
+		t.Require().Nil(resp)
+		t.Require().NotNil(err)
+	}
+}
+
+func (suite *EventRepositoryTestSuite) TestGetEvent_OK(t provider.T) {
+	column := []string{"id", "name", "description", "date"}
+	query := "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS"
+	testCase := map[int]struct {
+		nameTest       string
+		mockResponse   domain.Event
+		mockError      error
+		expectResponse domain.Event
+		expectError    error
+	}{
+		1: {
+			nameTest:       "Test Ok",
+			mockResponse:   *builder.EventMother{}.Obj1(),
+			mockError:      nil,
+			expectResponse: *builder.EventMother{}.Obj1(),
+			expectError:    nil,
+		},
+		2: {
+			nameTest:       "Test Ok empty response",
+			mockResponse:   *builder.EventMother{}.Obj0(),
+			mockError:      nil,
+			expectResponse: *builder.EventMother{}.Obj0(),
+			expectError:    nil,
+		},
+	}
+
+	for _, test := range testCase {
+		suite.mock.ExpectQuery(query).
+			WillReturnRows(sqlmock.NewRows(column).
 				AddRow(
-					test.expectedResponse.ID,
-					test.expectedResponse.Name,
-					test.expectedResponse.Description,
-					test.expectedResponse.Date,
+					test.mockResponse.ID,
+					test.mockResponse.Name,
+					test.mockResponse.Description,
+					test.mockResponse.Date,
 				))
 
 		resp, err := suite.repository.GetEvent(1)
 
 		t.Require().Nil(err)
 		t.Require().NotNil(resp)
+
+		t.Require().Equal(test.expectResponse, resp)
 	}
 }
 
-func (suite *EventRepositoryTestSuite) TestCreateEvent(t provider.T) {
+func (suite *EventRepositoryTestSuite) TestGetEvent_Error(t provider.T) {
+	query := "SELECT ID, NAME, DESCRIPTION, DATE FROM EVENTS"
 	testCase := map[int]struct {
-		nameTest         string
-		column           []string
-		expectedResponse domain.Event
-		expectedError    error
-		Query            string
-		actualResponse   domain.Event
-		actualError      error
+		nameTest       string
+		mockResponse   domain.Event
+		mockError      error
+		expectResponse domain.Event
+		expectError    error
 	}{
-		1: {
-			nameTest:         "Test Ok",
-			column:           []string{"id"},
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    nil,
-			Query:            "INSERT INTO EVENTS",
-			actualResponse:   domain.Event{ID: 1, Name: "name", Description: "description", Date: time.Time{}},
-			actualError:      nil,
-		},
-		2: {
-			nameTest:         "Test Error",
-			column:           []string{"id"},
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    errors.New("error postgres"),
-			Query:            "INSERT INTO EVENTS",
-			actualResponse:   domain.Event{},
-			actualError:      errors.New("error postgres"),
+		3: {
+			nameTest:       "Test Error",
+			mockResponse:   *builder.EventMother{}.Obj0(),
+			mockError:      errors.New("error postgres"),
+			expectResponse: *builder.EventMother{}.Obj0(),
+			expectError:    errors.New("error postgres"),
 		},
 	}
 
 	for _, test := range testCase {
-		suite.mock.ExpectQuery(test.Query).WithArgs(
-			test.expectedResponse.Name,
-			test.expectedResponse.Description,
-			test.expectedResponse.Date,
+		suite.mock.ExpectQuery(query).
+			WillReturnError(test.mockError)
+
+		resp, err := suite.repository.GetEvent(1)
+
+		t.Require().NotNil(err)
+
+		t.Require().Equal(test.expectResponse, resp)
+	}
+}
+
+func (suite *EventRepositoryTestSuite) TestCreateEvent_OK(t provider.T) {
+	column := []string{"id"}
+	query := "INSERT INTO EVENTS"
+	testCase := map[int]struct {
+		nameTest       string
+		mockResponse   domain.Event
+		mockError      error
+		expectResponse int
+		expectError    error
+	}{
+		1: {
+			nameTest:       "Test Ok",
+			mockResponse:   domain.Event{ID: 1, Name: "name", Description: "description"},
+			mockError:      nil,
+			expectResponse: 1,
+			expectError:    nil,
+		},
+	}
+
+	for _, test := range testCase {
+		suite.mock.ExpectQuery(query).WithArgs(
+			test.mockResponse.Name,
+			test.mockResponse.Description,
+			test.mockResponse.Date,
 		).
-			WillReturnRows(sqlmock.NewRows(test.column).
+			WillReturnRows(sqlmock.NewRows(column).
 				AddRow(
-					test.expectedResponse.ID,
+					test.mockResponse.ID,
 				))
 
-		resp, err := suite.repository.CreateEvent(test.expectedResponse)
+		resp, err := suite.repository.CreateEvent(test.mockResponse)
 
 		t.Require().Nil(err)
 		t.Require().NotNil(resp)
+
+		t.Require().Equal(test.expectResponse, resp)
 	}
 }
 
-func (suite *EventRepositoryTestSuite) TestUpdateEvent(t provider.T) {
+func (suite *EventRepositoryTestSuite) TestCreateEvent_Error(t provider.T) {
+	query := "INSERT INTO EVENTS"
 	testCase := map[int]struct {
-		nameTest         string
-		column           []string
-		expectedResponse domain.Event
-		expectedError    error
-		Query            string
-		actualResponse   domain.Event
-		actualError      error
+		nameTest       string
+		mockResponse   domain.Event
+		mockError      error
+		expectResponse int
+		expectError    error
 	}{
-		1: {
-			nameTest:         "Test Ok",
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    nil,
-			Query:            "UPDATE EVENTS",
-			actualResponse:   domain.Event{ID: 1, Name: "name", Description: "description", Date: time.Time{}},
-			actualError:      nil,
-		},
 		2: {
-			nameTest:         "Test Error",
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    errors.New("error postgres"),
-			Query:            "UPDATE EVENTS",
-			actualResponse:   domain.Event{},
-			actualError:      errors.New("error postgres"),
+			nameTest:       "Test Error",
+			mockResponse:   domain.Event{ID: 1, Name: "name", Description: "description"},
+			mockError:      errors.New("error postgres"),
+			expectResponse: 0,
+			expectError:    errors.New("error postgres"),
 		},
 	}
 
 	for _, test := range testCase {
-		suite.mock.ExpectExec(test.Query).WithArgs(
-			test.expectedResponse.Name,
-			test.expectedResponse.Description,
-			test.expectedResponse.Date,
+		suite.mock.ExpectQuery(query).WithArgs(
+			test.mockResponse.Name,
+			test.mockResponse.Description,
+			test.mockResponse.Date,
+		).
+			WillReturnError(test.expectError)
 
-			test.expectedResponse.ID,
+		resp, err := suite.repository.CreateEvent(test.mockResponse)
+
+		t.Require().NotNil(err)
+		t.Require().Equal(test.expectResponse, resp)
+	}
+}
+
+func (suite *EventRepositoryTestSuite) TestUpdateEvent_OK(t provider.T) {
+	query := "UPDATE EVENTS"
+	testCase := map[int]struct {
+		nameTest    string
+		mockArgs    domain.Event
+		mockError   error
+		expectError error
+	}{
+		1: {
+			nameTest:    "Test Ok",
+			mockArgs:    domain.Event{ID: 1, Name: "name", Description: "description"},
+			mockError:   nil,
+			expectError: nil,
+		},
+	}
+
+	for _, test := range testCase {
+		suite.mock.ExpectExec(query).WithArgs(
+			test.mockArgs.Name,
+			test.mockArgs.Description,
+			test.mockArgs.Date,
+
+			test.mockArgs.ID,
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 
-		err := suite.repository.UpdateEvent(test.expectedResponse, 1)
+		err := suite.repository.UpdateEvent(test.mockArgs, 1)
 
 		t.Require().Nil(err)
 	}
 }
 
-func (suite *EventRepositoryTestSuite) TestDeleteEvent(t provider.T) {
+func (suite *EventRepositoryTestSuite) TestUpdateEvent_Error(t provider.T) {
+	query := "UPDATE EVENTS"
 	testCase := map[int]struct {
-		nameTest         string
-		column           []string
-		expectedResponse domain.Event
-		expectedError    error
-		Query            string
-		actualResponse   domain.Event
-		actualError      error
+		nameTest    string
+		mockArgs    domain.Event
+		mockError   error
+		expectError error
 	}{
-		1: {
-			nameTest:         "Test Ok",
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    nil,
-			Query:            "DELETE FROM EVENTS",
-			actualResponse:   domain.Event{ID: 1, Name: "name", Description: "description", Date: time.Time{}},
-			actualError:      nil,
-		},
 		2: {
-			nameTest:         "Test Error",
-			expectedResponse: domain.Event{ID: 1, Name: "name", Description: "description"},
-			expectedError:    errors.New("error postgres"),
-			Query:            "DELETE FROM EVENTS",
-			actualResponse:   domain.Event{},
-			actualError:      errors.New("error postgres"),
+			nameTest:    "Test Error",
+			mockArgs:    domain.Event{ID: 1, Name: "name", Description: "description"},
+			mockError:   errors.New("error postgres"),
+			expectError: errors.New("error postgres"),
 		},
 	}
 
 	for _, test := range testCase {
-		suite.mock.ExpectExec(test.Query).WithArgs(
-			test.expectedResponse.ID,
+		suite.mock.ExpectExec(query).WithArgs(
+			test.mockArgs.Name,
+			test.mockArgs.Description,
+			test.mockArgs.Date,
+
+			test.mockArgs.ID,
+		).WillReturnError(test.expectError)
+
+		err := suite.repository.UpdateEvent(test.mockArgs, 1)
+
+		t.Require().NotNil(err)
+	}
+}
+
+func (suite *EventRepositoryTestSuite) TestDeleteEvent_OK(t provider.T) {
+	query := "DELETE FROM EVENTS"
+	testCase := map[int]struct {
+		nameTest    string
+		mockArgs    int
+		mockError   error
+		expectError error
+	}{
+		1: {
+			nameTest:    "Test Ok",
+			mockArgs:    1,
+			mockError:   nil,
+			expectError: nil,
+		},
+	}
+
+	for _, test := range testCase {
+		suite.mock.ExpectExec(query).WithArgs(
+			test.mockArgs,
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 
 		err := suite.repository.DeleteEvent(1)
 
 		t.Require().Nil(err)
+	}
+}
+
+func (suite *EventRepositoryTestSuite) TestDeleteEvent_Error(t provider.T) {
+	query := "DELETE FROM EVENTS"
+	testCase := map[int]struct {
+		nameTest    string
+		mockArgs    int
+		mockError   error
+		expectError error
+	}{
+		2: {
+			nameTest:    "Test Error",
+			mockArgs:    1,
+			mockError:   errors.New("error postgres"),
+			expectError: errors.New("error postgres"),
+		},
+	}
+
+	for _, test := range testCase {
+		suite.mock.ExpectExec(query).WithArgs(
+			test.mockArgs,
+		).WillReturnError(test.expectError)
+
+		err := suite.repository.DeleteEvent(1)
+
+		t.Require().NotNil(err)
 	}
 }
 
