@@ -27,7 +27,11 @@ type CreateEventIntegrationTestSuite struct {
 
 func (suite *CreateEventIntegrationTestSuite) BeforeEach(t provider.T) {
 	// Storage
-	storage := storage.NewStorage(*postgres.NewMockPostgres(db))
+	db, err := postgres.NewPostgres(dataURI)
+	if err != nil {
+		panic(err)
+	}
+	storage := storage.NewStorage(*db)
 
 	logger := log.New()
 	suite.eventService = app.NewEventService(logger, storage)
