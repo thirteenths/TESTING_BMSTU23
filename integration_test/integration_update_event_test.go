@@ -14,7 +14,7 @@ import (
 	"github.com/thirteenths/test-bmstu23/internal/infra/postgres"
 )
 
-type CreateEventIntegrationTestSuite struct {
+type UpdateEventIntegrationTestSuite struct {
 	suite.Suite
 	eventService *app.EventService
 	ctx          context.Context
@@ -25,7 +25,10 @@ type CreateEventIntegrationTestSuite struct {
 	}
 }
 
-func (suite *CreateEventIntegrationTestSuite) BeforeEach(t provider.T) {
+func (suite *UpdateEventIntegrationTestSuite) BeforeAll(t provider.T) {
+	t.Epic("Demo")
+	t.Feature("BeforeAfter")
+	t.NewStep("This Step will be before Each")
 	// Storage
 	storage := storage.NewStorage(*postgres.NewMockPostgres(db))
 
@@ -56,36 +59,34 @@ func (suite *CreateEventIntegrationTestSuite) BeforeEach(t provider.T) {
 
 }
 
-func (suite *CreateEventIntegrationTestSuite) AfterAll(t provider.T) {}
+func (suite *UpdateEventIntegrationTestSuite) AfterAll(t provider.T) {}
 
-func TestIntegration_CreateEvent(t *testing.T) {
-	suite.RunSuite(t, &CreateEventIntegrationTestSuite{})
+func TestIntegration_UpdateEvent(t *testing.T) {
+	suite.RunSuite(t, &UpdateEventIntegrationTestSuite{})
 }
 
-func (suite *CreateEventIntegrationTestSuite) TestCreateEvent_Ok(t provider.T) {
+func (suite *UpdateEventIntegrationTestSuite) TestUpdateEvent_Ok(t provider.T) {
 	// Migration
 	if err := goose.UpTo(db, "migrations", suite.testCase[2].version); err != nil {
 		log.Warnf("Error migration: %s", err)
 	}
 	// Call the service method
-	actualResponse, actualError := suite.eventService.CreateEvent(suite.ctx, requests.CreateEvent{})
+	actualError := suite.eventService.UpdateEvent(suite.ctx, requests.UpdateEvent{}, 1)
 
 	// Compare the expected and actual responses
 	t.Require().Nil(actualError)
-	t.Require().NotEqual(1, actualResponse)
 
 }
 
-/*func (suite *CreateEventIntegrationTestSuite) TestCreateEvent_Error(t provider.T) {
+/*func (suite *UpdateEventIntegrationTestSuite) TestUpdateEvent_Error(t provider.T) {
 	// Migration
 	if err := goose.DownTo(db, "migrations", suite.testCase[1].version); err != nil {
 		log.Warnf("Error migration: %s", err)
 	}
 	// Call the service method
-	actualResponse, actualError := suite.eventService.CreateEvent(suite.ctx, requests.CreateEvent{})
+	actualError := suite.eventService.UpdateEvent(suite.ctx, requests.UpdateEvent{}, 1)
 
 	// Compare the expected and actual responses
 	t.Require().NotNil(actualError)
-	t.Require().Equal(0, actualResponse)
-}
-*/
+
+}*/

@@ -8,5 +8,5 @@ INSERT INTO EVENTS (name, DESCRIPTION, DATE) VALUES ('Стендап Лайна�
 
 -- +goose Down
 -- +goose StatementBegin
-TRUNCATE TABLE  EVENTS;
+DELETE FROM  EVENTS;
 -- +goose StatementEnd

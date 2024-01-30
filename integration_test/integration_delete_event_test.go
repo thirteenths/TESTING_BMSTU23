@@ -9,12 +9,11 @@ import (
 	"testing"
 
 	"github.com/thirteenths/test-bmstu23/internal/app"
-	"github.com/thirteenths/test-bmstu23/internal/domain/requests"
 	"github.com/thirteenths/test-bmstu23/internal/domain/storage"
 	"github.com/thirteenths/test-bmstu23/internal/infra/postgres"
 )
 
-type CreateEventIntegrationTestSuite struct {
+type DeleteEventIntegrationTestSuite struct {
 	suite.Suite
 	eventService *app.EventService
 	ctx          context.Context
@@ -25,7 +24,7 @@ type CreateEventIntegrationTestSuite struct {
 	}
 }
 
-func (suite *CreateEventIntegrationTestSuite) BeforeEach(t provider.T) {
+func (suite *DeleteEventIntegrationTestSuite) BeforeAll(t provider.T) {
 	// Storage
 	storage := storage.NewStorage(*postgres.NewMockPostgres(db))
 
@@ -56,36 +55,36 @@ func (suite *CreateEventIntegrationTestSuite) BeforeEach(t provider.T) {
 
 }
 
-func (suite *CreateEventIntegrationTestSuite) AfterAll(t provider.T) {}
+func (suite *DeleteEventIntegrationTestSuite) AfterAll(t provider.T) {}
 
-func TestIntegration_CreateEvent(t *testing.T) {
-	suite.RunSuite(t, &CreateEventIntegrationTestSuite{})
+func TestIntegration_DeleteEvent(t *testing.T) {
+	suite.RunSuite(t, &DeleteEventIntegrationTestSuite{})
 }
 
-func (suite *CreateEventIntegrationTestSuite) TestCreateEvent_Ok(t provider.T) {
+func (suite *DeleteEventIntegrationTestSuite) TestDeleteEvent_Ok(t provider.T) {
 	// Migration
 	if err := goose.UpTo(db, "migrations", suite.testCase[2].version); err != nil {
 		log.Warnf("Error migration: %s", err)
 	}
 	// Call the service method
-	actualResponse, actualError := suite.eventService.CreateEvent(suite.ctx, requests.CreateEvent{})
+	actualError := suite.eventService.DeleteEvent(suite.ctx, 1)
 
 	// Compare the expected and actual responses
 	t.Require().Nil(actualError)
-	t.Require().NotEqual(1, actualResponse)
-
 }
 
-/*func (suite *CreateEventIntegrationTestSuite) TestCreateEvent_Error(t provider.T) {
+/*func (suite *DeleteEventIntegrationTestSuite) TestDeleteEvent_Error(t provider.T) {
 	// Migration
 	if err := goose.DownTo(db, "migrations", suite.testCase[1].version); err != nil {
 		log.Warnf("Error migration: %s", err)
 	}
+
+	if err := goose.Down(db, "migrations"); err != nil {
+		log.Warnf("Error migration: %s", err)
+	}
 	// Call the service method
-	actualResponse, actualError := suite.eventService.CreateEvent(suite.ctx, requests.CreateEvent{})
+	actualError := suite.eventService.DeleteEvent(suite.ctx, 1)
 
 	// Compare the expected and actual responses
 	t.Require().NotNil(actualError)
-	t.Require().Equal(0, actualResponse)
-}
-*/
+}*/
