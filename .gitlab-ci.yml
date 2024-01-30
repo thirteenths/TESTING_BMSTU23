@@ -20,11 +20,28 @@ docker_job:
       - ./allure-results
     expire_in: 1 day
 
+integration-tests:
+  stage: testing
+  tags:
+    - docker
+  image: golang:1.21
+  services:
+    - postgres:14.3
+  variables:
+    BACKEND_POSTGRES_HOST: "postgres"
+    POSTGRES_DB: "postgres"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "7dgvJVDJvh254aqOpfd"
+  before_script:
+    - go mod download && go mod verify
+  script:
+    - make integration-test
+
 history_job:
   stage: history_copy
   tags:
     - docker
-  image: storytel/alpine-bash-curl 
+  image: storytel/alpine-bash-curl
   script:
     - 'curl --location --output artifacts.zip "https://git.iu7.bmstu.ru/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/lab_01/download?job=pages&job_token=$CI_JOB_TOKEN"'  # С помощью api гитлаба скачиваем файлы из job, который будет указан ниже. Обратите внимание на текст на русском в ссылке. Очень важно указать вместо текста и скобок номер вашего репозиториия
     - apk add unzip # Образ, используемый в этом шаге по умолчанию не имеет утилиты unzip, по этой причине мы добавляем её в контейнер
