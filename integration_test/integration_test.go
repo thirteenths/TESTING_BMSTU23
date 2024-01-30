@@ -15,7 +15,7 @@ import (
 )
 
 var db *sql.DB
-var dataURI string = "postgres://postgres:7dgvJVDJvh254aqOpfd@localhost:5432/postgres?sslmode=disable"
+var dataURI string = "postgres://postgres:7dgvJVDJvh254aqOpfd@postgres:5432/postgres?sslmode=disable"
 
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
