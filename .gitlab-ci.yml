@@ -43,6 +43,23 @@ integration-tests:
   script:
     - make integration-test
 
+end-to-end-tests:
+  stage: testing
+  tags:
+    - docker
+  image: golang:1.21
+  services:
+    - postgres:11.7
+  variables:
+    POSTGRES_DB: "postgres"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "7dgvJVDJvh254aqOpfd"
+    POSTGRES_HOST_AUTH_METHOD: trust
+  before_script:
+    - go mod download && go mod verify
+  script:
+    - make run-api
+
 history_job:
   stage: history_copy
   tags:
