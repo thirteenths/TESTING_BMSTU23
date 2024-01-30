@@ -34,12 +34,12 @@ func TestMain(m *testing.M) {
 	// pulls an image, creates a container based on it and runs it
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "postgres",
-		Tag:        "11",
+		Tag:        "13",
 		Env: []string{
 			"POSTGRES_PASSWORD=secret",
 			"POSTGRES_USER=user_name",
 			"POSTGRES_DB=dbname",
-			"listen_addresses = '*'",
+			// "listen_addresses = '*'",
 		},
 	}, func(config *docker.HostConfig) {
 		// set AutoRemove to true so that stopped container goes away by itself
@@ -50,8 +50,9 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
-	hostAndPort := resource.GetHostPort("5432/tcp")
-	databaseUrl := fmt.Sprintf("postgres://user_name:secret@%s/dbname?sslmode=disable", hostAndPort)
+	// hostAndPort := resource.GetHostPort("5432/tcp")
+	port := resource.GetPort("5432/tcp")
+	databaseUrl := fmt.Sprintf("postgres://user_name:secret@docker:%s/dbname?sslmode=disable", port)
 
 	log.Println("Connecting to database on url: ", databaseUrl)
 
