@@ -15,12 +15,11 @@ import (
 )
 
 var db *sql.DB
-var dataURI string = "postgres://postgres:7dgvJVDJvh254aqOpfd@postgres:5432/postgres?sslmode=disable"
 
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
-func NTestMain(m *testing.M) {
+func TestMain(m *testing.M) {
 	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
 	pool, err := dockertest.NewPool("")
 	if err != nil {

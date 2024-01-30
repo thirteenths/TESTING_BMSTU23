@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"context"
-	"embed"
 	"github.com/ozontech/allure-go/pkg/framework/provider"
 	"github.com/ozontech/allure-go/pkg/framework/suite"
 	"github.com/pressly/goose/v3"
@@ -26,19 +25,9 @@ type CreateEventIntegrationTestSuite struct {
 	}
 }
 
-//go:embed migrations/*.sql
-var embedMigrations embed.FS
-
-func (suite *CreateEventIntegrationTestSuite) BeforeAll(t provider.T) {
+func (suite *CreateEventIntegrationTestSuite) BeforeEach(t provider.T) {
 	// Storage
-	var dataURI string = "postgres://postgres:7dgvJVDJvh254aqOpfd@postgres:5432/postgres?sslmode=disable"
-	log.Println("Connecting to database on url: ", dataURI)
-
-	db, err := postgres.NewPostgres(dataURI)
-	if err != nil {
-		panic(err)
-	}
-	storage := storage.NewStorage(*db)
+	storage := storage.NewStorage(*postgres.NewMockPostgres(db))
 
 	logger := log.New()
 	suite.eventService = app.NewEventService(logger, storage)
