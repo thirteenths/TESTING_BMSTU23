@@ -4,27 +4,27 @@ stages:
   - reports # Генерация отчета
   - deploy # Публикация отчета на gitlab pages
 
-docker_job: # Название job
-  stage: testing # Первый stage, который нужно выполнить
+docker_job:
+  stage: testing
   tags:
-    - docker # С помощью этого тега gitlab поймет, какой раннер нужно запустить. Он запустит докер контейнер, из образа, который мы указывали в 6 шаге регистрации раннера.
-  image: golang:1.21 # Нужно указать образ, который будет использоваться для запуска тестов.
+    - docker
+  image: golang:1.21
   before_script:
-    - go mod download && go mod verify # Устанавливаем пакеты в поднятом контейнере перед запуском самих тестов
+    - go mod download && go mod verify
   script:
-    - make unit-test # Запускаем тесты параллельно(-n=4 обеспечивает нам это), указав папку с результатами тестов через --alluredir=
+    - make unit-test
   allow_failure: true # Это позволит нам продолжить выполнение пайплайна в случае, если тесты упали.
-  artifacts: # Сущность, с помощью которой, мы сохраним результат тестирования.
+  artifacts:
     when: always # Сохранять всегда
     paths:
-      - ./allure-results # Здесь будет сохранен отчет
-    expire_in: 1 day # Да, он будет удален через день. Нет смысла хранить его в течение длительного срока.
+      - ./allure-results
+    expire_in: 1 day
 
-history_job: # Название job
-  stage: history_copy # Это второй stage, который нужно выполнить
+history_job:
+  stage: history_copy
   tags:
-    - docker # Пользуемся тем же самым раннером
-  image: storytel/alpine-bash-curl # Но теперь укажем раннеру использовать другой образ, для того чтобы скачать результаты теста из предыдущего пайплайна. Нам же нужна история тестов, верно?
+    - docker
+  image: storytel/alpine-bash-curl 
   script:
     - 'curl --location --output artifacts.zip "https://git.iu7.bmstu.ru/api/v4/projects/$CI_PROJECT_ID/jobs/artifacts/lab_01/download?job=pages&job_token=$CI_JOB_TOKEN"'  # С помощью api гитлаба скачиваем файлы из job, который будет указан ниже. Обратите внимание на текст на русском в ссылке. Очень важно указать вместо текста и скобок номер вашего репозиториия
     - apk add unzip # Образ, используемый в этом шаге по умолчанию не имеет утилиты unzip, по этой причине мы добавляем её в контейнер
