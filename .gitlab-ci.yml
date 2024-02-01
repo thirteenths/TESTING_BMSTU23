@@ -44,8 +44,8 @@ stages:
 #  script:
 #    - make integration-test
 
-before_script:
-  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+#before_script:
+#  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 publish:image:docker:
   stage: publish
