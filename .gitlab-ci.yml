@@ -51,8 +51,7 @@ stages:
 build-image:
   stage: build
   services:
-    #  - postgres:11.7
-    - docker:dind
+    - docker:24.0.5-dind
   variables:
     # Set the Docker host to be the one of the previously created service (This forwards the user of the docker command to this service instead of running it inside the container of this build job.)
     DOCKER_HOST: tcp://docker:2375
@@ -64,8 +63,7 @@ build-image:
 publish-image:
   stage: publish
   services:
-    #  - postgres:11.7
-    - docker:dind
+    - docker:24.0.5-dind
   variables:
     # Set the Docker host to be the one of the previously created service (This forwards the user of the docker command to this service instead of running it inside the container of this build job.)
     DOCKER_HOST: tcp://docker:2375
