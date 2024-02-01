@@ -1,6 +1,6 @@
 stages:
-  - publish
   - build
+  - publish
   - testing # Запуск тестов
   - history_copy # Копирование результата тестов из предыдущего запуска тестов
   - reports # Генерация отчета
@@ -72,7 +72,7 @@ publish-image:
     # By GitLab recommended storage driver when using Docker-in-Docker (see https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-the-overlayfs-driver)
     DOCKER_DRIVER: overlay2
   script:
-    - docker login -u $CIREGISTRYUSER -p $CIREGISTRYPASSWORD $CIREGISTRY
+    - docker login -u $CIREGISTRYUSER -p $CIREGISTRYPASSWORD --password-stdin
     - docker tag my-docker-image $CIREGISTRY/my-docker-image
     - docker push $CIREGISTRY/my-docker-image
 
