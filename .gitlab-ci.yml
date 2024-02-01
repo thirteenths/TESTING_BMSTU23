@@ -1,4 +1,5 @@
 stages:
+  - publish
   - build
   - testing # Запуск тестов
   - history_copy # Копирование результата тестов из предыдущего запуска тестов
@@ -47,23 +48,17 @@ stages:
 #before_script:
 #  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
-build:
-  image: docker:20.10.16
+build-image:
   stage: build
-  services:
-    - docker:20.10.16-dind
   script:
-    - |
-      docker login "$CI_REGISTRY" \
-        --username "$CI_REGISTRY_USER" \
-        --password "$CI_REGISTRY_PASSWORD"
-      
-      docker build \
-        --file "Dockerfile" \
-        --tag "$CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_REF_SLUG" .
-      
-      docker push "$CI_REGISTRY/$CI_PROJECT_PATH:$CI_COMMIT_REF_SLUG"
+    - docker build -t my-docker-image cmd/api/
 
+publish-image:
+  stage: publish
+  script:
+    - docker login -u $CIREGISTRYUSER -p $CIREGISTRYPASSWORD $CIREGISTRY
+    - docker tag my-docker-image $CIREGISTRY/my-docker-image
+    - docker push $CIREGISTRY/my-docker-image
 
 end-to-end-tests:
   stage: testing
