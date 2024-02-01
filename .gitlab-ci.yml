@@ -1,5 +1,5 @@
 stages:
-  - publish
+  - build
   - testing # Запуск тестов
   - history_copy # Копирование результата тестов из предыдущего запуска тестов
   - reports # Генерация отчета
@@ -47,18 +47,16 @@ stages:
 #before_script:
 #  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
-publish:image:docker:
-  stage: publish
-  image: docker
+build:
+  image: docker:20.10.16
+  stage: build
   services:
-    - name: docker:dind
-      alias: docker
-  variables:
-    CI_DOCKER_NAME: ${CI_REGISTRY_IMAGE}/my-docker-image
+    - docker:20.10.16-dind
   script:
-    - docker pull $CI_REGISTRY_IMAGE || true
-    - docker build --pull --cache-from $CI_REGISTRY_IMAGE --tag $CI_DOCKER_NAME --file Dockerfile /deployments/
-    - docker push $CI_DOCKER_NAME
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/group/project/image:latest .
+    - docker push $CI_REGISTRY/group/project/image:latest
+
 
 end-to-end-tests:
   stage: testing
