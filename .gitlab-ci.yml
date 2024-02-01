@@ -59,6 +59,8 @@ end-to-end-tests:
     POSTGRES_HOST_AUTH_METHOD: trust
   before_script:
     - go mod download && go mod verify
+  script:
+    - ls
 
 history_job:
   stage: history_copy
