@@ -70,7 +70,7 @@ end-to-end-tests:
     - go mod download && go mod verify
   script:
     - make run-api &
-    - make unit-test
+    - make e2e-test
 
 history_job:
   stage: history_copy

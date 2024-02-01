@@ -32,3 +32,6 @@ unit-test:
 
 integration-test:
 	cd integration_test && go test -v -race -p=1
+
+e2e-test:
+	cd e2e_test && go test -v -race -p=1
