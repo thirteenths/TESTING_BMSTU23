@@ -69,7 +69,7 @@ end-to-end-tests:
   before_script:
     - go mod download && go mod verify
   script:
-    - docker-compose up
+    - cd deployments && docker-compose up
 
 history_job:
   stage: history_copy
