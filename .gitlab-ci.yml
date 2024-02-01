@@ -69,7 +69,8 @@ end-to-end-tests:
   before_script:
     - go mod download && go mod verify
   script:
-    - make run-api
+    - make run-api > output.txt &
+    - make unit-test
 
 history_job:
   stage: history_copy
