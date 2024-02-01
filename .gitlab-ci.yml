@@ -43,6 +43,22 @@ stages:
 #  script:
 #    - make integration-test
 
+before_script:
+  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+publish:image:docker:
+  stage: publish
+  image: docker
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    CI_DOCKER_NAME: ${CI_REGISTRY_IMAGE}/my-docker-image
+  script:
+    - docker pull $CI_REGISTRY_IMAGE || true
+    - docker build --pull --cache-from $CI_REGISTRY_IMAGE --tag $CI_DOCKER_NAME --file Dockerfile /deployments/
+    - docker push $CI_DOCKER_NAME
+
 end-to-end-tests:
   stage: testing
   tags:
