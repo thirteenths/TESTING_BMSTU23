@@ -49,6 +49,7 @@ stages:
 #  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 build-image:
+  image: docker:24.0.5
   stage: build
   services:
     - docker:24.0.5-dind
@@ -61,6 +62,7 @@ build-image:
     - docker build -t my-docker-image cmd/api/
 
 publish-image:
+  image: docker:24.0.5
   stage: publish
   services:
     - docker:24.0.5-dind
