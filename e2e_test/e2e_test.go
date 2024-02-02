@@ -21,10 +21,14 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	db, err = sql.Open("postgres", "postgres://postgres:7dgvJVDJvh254aqOpfd@localhost:5432/postgres?sslmode=disable")
+	db, err = sql.Open("postgres", "postgres://postgres:7dgvJVDJvh254aqOpfd@postgres:5432/postgres?sslmode=disable")
 	if err != nil {
 		log.Fatalf("Could not connected: %s", err)
 	}
 
+	err = goose.UpTo(db, "migrations", 20231206192143)
+	if err != nil {
+		log.Warnf("Error migration: %s", err)
+	}
 	m.Run()
 }
