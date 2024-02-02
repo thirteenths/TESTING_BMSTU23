@@ -51,7 +51,7 @@ func main() {
 
 	// Storage
 	pg, err := postgres.NewPostgres(
-		"postgres://postgres:7dgvJVDJvh254aqOpfd@docker:5432/postgres?sslmode=disable",
+		"postgres://postgres:7dgvJVDJvh254aqOpfd@postgres:5432/postgres?sslmode=disable",
 	)
 	if err != nil {
 		logger.WithError(err).Errorf("can`t connect to postgres")
