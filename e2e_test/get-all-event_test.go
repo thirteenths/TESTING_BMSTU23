@@ -23,10 +23,10 @@ func (suite *GetAllEventEnd2EndTestSuite) BeforeAll(t provider.T) {
 }
 
 func (suite *GetAllEventEnd2EndTestSuite) AfterAll(t provider.T) {
-	err := goose.DownTo(db, "migrations", 20240117165259)
+	/*err := goose.DownTo(db, "migrations", 20240117165259)
 	if err != nil {
 		log.Warnf("Error migration: %s", err)
-	}
+	}*/
 }
 
 func TestEndToEnd_GetAllEvent(t *testing.T) {

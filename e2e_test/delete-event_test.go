@@ -23,10 +23,10 @@ func (suite *DeleteEventEnd2EndTestSuite) BeforeAll(t provider.T) {
 }
 
 func (suite *DeleteEventEnd2EndTestSuite) AfterAll(t provider.T) {
-	err := goose.DownTo(db, "migrations", 20240117165259)
+	/*err := goose.DownTo(db, "migrations", 20240117165259)
 	if err != nil {
 		log.Warnf("Error migration: %s", err)
-	}
+	}*/
 }
 
 func TestEndToEnd_DeleteEvent(t *testing.T) {
@@ -36,7 +36,7 @@ func TestEndToEnd_DeleteEvent(t *testing.T) {
 func (suite *DeleteEventEnd2EndTestSuite) TestDeleteEvent(t provider.T) {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("DELETE", "http://localhost:5000/bmstu-stud-web/api/events/1", nil)
+	req, err := http.NewRequest("DELETE", "http://localhost:5000/bmstu-stud-web/api/events/2", nil)
 	if err != nil {
 		panic(err)
 	}
