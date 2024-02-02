@@ -31,4 +31,9 @@ func TestMain(m *testing.M) {
 		log.Warnf("Error migration: %s", err)
 	}
 	m.Run()
+
+	err = goose.DownTo(db, "migrations", 20231206192143)
+	if err != nil {
+		log.Warnf("Error migration: %s", err)
+	}
 }
