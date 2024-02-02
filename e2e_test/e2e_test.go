@@ -3,6 +3,7 @@ package e2e_test
 import (
 	"database/sql"
 	"embed"
+	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	log "github.com/sirupsen/logrus"
 	"testing"
