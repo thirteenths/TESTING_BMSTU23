@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetEvent(t *testing.T) {
-	resp, err := http.Get("http://localhost:5000/rush-stand-up-club/api/events/")
+	resp, err := http.Get("http://localhost:5000/bmstu-stud-web/api/events/")
 	if err != nil {
 		panic(err)
 	}
