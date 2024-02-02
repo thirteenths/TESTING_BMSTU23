@@ -3,11 +3,18 @@ package e2e_test
 import (
 	"bufio"
 	"fmt"
+	"github.com/pressly/goose/v3"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"testing"
 )
 
 func TestGetEvent(t *testing.T) {
+	err := goose.UpTo(db, "migrations", 20240117165259)
+	if err != nil {
+		log.Warnf("Error migration: %s", err)
+	}
+
 	resp, err := http.Get("http://localhost:5000/bmstu-stud-web/api/events/")
 	if err != nil {
 		panic(err)
@@ -23,5 +30,10 @@ func TestGetEvent(t *testing.T) {
 
 	if err := scanner.Err(); err != nil {
 		panic(err)
+	}
+
+	err = goose.DownTo(db, "migrations", 20240117165259)
+	if err != nil {
+		log.Warnf("Error migration: %s", err)
 	}
 }
