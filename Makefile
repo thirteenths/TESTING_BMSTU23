@@ -28,10 +28,13 @@ migration-create-sql:
 	goose -dir=./migrations create $(NAME) sql
 
 unit-test:
-	cd internal && go test -v -race -p=1 ./...
+	cd internal && go test -v -race -p=1 -shuffle on ./...
 
 integration-test:
 	cd integration_test && go test -v -race -p=1
 
 e2e-test:
 	cd e2e_test && go test -v -race -p=1
+
+bdd-test:
+	cd bdd_test && go test -v
