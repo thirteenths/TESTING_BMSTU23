@@ -50,9 +50,9 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not start resource: %s", err)
 	}
 
-	hostAndPort := resource.GetHostPort("5432/tcp")
-	// port := resource.GetPort("5432/tcp")
-	databaseUrl := fmt.Sprintf("postgres://user_name:secret@%s/dbname?sslmode=disable", hostAndPort)
+	// hostAndPort := resource.GetHostPort("5432/tcp")
+	port := resource.GetPort("5432/tcp")
+	databaseUrl := fmt.Sprintf("postgres://user_name:secret@docker:%s/dbname?sslmode=disable", port)
 
 	log.Println("Connecting to database on url: ", databaseUrl)
 
