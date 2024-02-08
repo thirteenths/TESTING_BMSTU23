@@ -1,8 +1,11 @@
 stages:
-  - testing # Запуск тестов
+  - unit
+  - integration
+  - e2e
+  - bdd
 
 unit-tests:
-  stage: testing
+  stage: unit
   tags:
     - docker
   image: golang:1.21
@@ -12,7 +15,7 @@ unit-tests:
     - make unit-test
 
 integration-tests:
-  stage: testing
+  stage: integration
   tags:
     - docker
   image: golang:1.21
@@ -29,7 +32,7 @@ integration-tests:
     - make integration-test
 
 end-to-end-tests:
-  stage: testing
+  stage: e2e
   tags:
     - docker
   image: golang:1.21
@@ -48,7 +51,7 @@ end-to-end-tests:
     - make e2e-test
 
 bdd-tests:
-  stage: testing
+  stage: bdd
   tags:
     - docker
   image: golang:1.21
