@@ -5,7 +5,7 @@ Feature: User Authentication
         """
         {
   		"email": "rachelle.huel@ethereal.email",
-  		"password": "C6s2S9qe6WrTMB7z3u"
+  		"password": $TEST_PASSWORD
 	    }
         """
     Then the response code should be 200
