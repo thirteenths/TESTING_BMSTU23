@@ -3,8 +3,6 @@ package bdd_test
 import (
 	"bufio"
 	"bytes"
-	"context"
-	"fmt"
 	"github.com/cucumber/godog"
 	"net/http"
 	"testing"
@@ -25,62 +23,42 @@ func TestFeatures(t *testing.T) {
 	}
 }
 
-func StepDefinitioninition1(ctx context.Context) error {
-	jsonBody := []byte(`{
-  		"email": "rachelle.huel@ethereal.email",
-  		"password": "C6s2S9qe6WrTMB7z3u"
-	}`)
+type bddTestAuth struct {
+	resp *http.Response
+}
+
+func (a *bddTestAuth) onRequestISendJson(arg1 string, arg2 *godog.DocString) (err error) {
+	jsonBody := []byte(arg2.Content)
 	bodyReader := bytes.NewReader(jsonBody)
 
-	resp, err := http.Post("http://localhost:5000/bmstu-stud-web/api/users/login", "application/json", bodyReader)
+	resp, err := http.Post("http://localhost:5000/bmstu-stud-web/api"+arg1, "application/json", bodyReader)
 	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	scanner := bufio.NewScanner(resp.Body)
-	for i := 0; scanner.Scan() && i < 5; i++ {
-		fmt.Println(scanner.Text())
+		return
 	}
 
-	return nil
+	a.resp = resp
+
+	return
 }
 
-func StepDefinitioninition2(ctx context.Context) error {
-	jsonBody := []byte(`{
-  		"email": "rachelle.huel@ethereal.email",
-  		"code": "23456789"
-	}`)
-	bodyReader := bytes.NewReader(jsonBody)
-
-	resp, err := http.Post("http://localhost:5000/bmstu-stud-web/api/users/verify", "application/json", bodyReader)
-	if err != nil {
-		panic(err)
+func (a *bddTestAuth) theResponseCodeShouldBe(arg1 int) (err error) {
+	if a.resp.StatusCode == arg1 {
+		return // errors.New("bad code return" + string(rune(arg1)))
 	}
-	defer resp.Body.Close()
+	return
+}
 
-	scanner := bufio.NewScanner(resp.Body)
-	for i := 0; scanner.Scan() && i < 5; i++ {
-		fmt.Println(scanner.Text())
+func (a *bddTestAuth) theResponseShouldMatchJson(arg1 *godog.DocString) (err error) {
+	scanner := bufio.NewScanner(a.resp.Body)
+	if scanner.Text() != arg1.Content {
+		return // errors.New("bad response: " + arg1.Content)
 	}
-
-	return nil
-}
-
-func iSendPOSTRequestTo(arg1 string) error {
-	return godog.ErrPending
-}
-
-func theResponseCodeShouldBe(arg1 int) error {
-	return godog.ErrPending
-}
-
-func theResponseShouldMatchJson(arg1 *godog.DocString) error {
-	return godog.ErrPending
+	return
 }
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Step(`^I send POST request to "([^"]*)"$`, iSendPOSTRequestTo)
-	ctx.Step(`^the response code should be (\d+)$`, theResponseCodeShouldBe)
-	ctx.Step(`^the response should match json:$`, theResponseShouldMatchJson)
+	bdd := &bddTestAuth{}
+	ctx.Step(`^On request "([^"]*)" I send json:$`, bdd.onRequestISendJson)
+	ctx.Step(`^the response code should be (\d+)$`, bdd.theResponseCodeShouldBe)
+	ctx.Step(`^the response should match json:$`, bdd.theResponseShouldMatchJson)
 }
