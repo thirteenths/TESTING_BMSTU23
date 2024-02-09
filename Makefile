@@ -37,4 +37,4 @@ e2e-test:
 	cd e2e_test && go test -v -race -p=1
 
 bdd-test:
-	cd bdd_test && go test -v
+	cd bdd_test && go test -v -race -p=1
