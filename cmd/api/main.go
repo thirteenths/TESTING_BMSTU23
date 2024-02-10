@@ -50,7 +50,9 @@ func main() {
 	router := chi.NewRouter()
 
 	// Storage
-	pg, err := postgres.NewPostgres("postgres://postgres:7dgvJVDJvh254aqOpfd@localhost:5432/postgres?sslmode=disable")
+	pg, err := postgres.NewPostgres(
+		"postgres://postgres:7dgvJVDJvh254aqOpfd@postgres:5432/postgres?sslmode=disable",
+	)
 	if err != nil {
 		logger.WithError(err).Errorf("can`t connect to postgres")
 	}
