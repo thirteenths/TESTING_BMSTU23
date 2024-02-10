@@ -67,6 +67,37 @@ func (p *Postgres) GetUserEvent(idUser int) ([]domain.Event, error) {
 
 const getUserQuery = "SELECT ID, EMAIL, HASH FROM USERS WHERE EMAIL=$1"
 
+func (p *Postgres) GetUser(id int) (domain.User, error) {
+	var user domain.User
+
+	err := p.db.QueryRow(getUserQuery, id).Scan(&user.ID, &user.Email, &user.Hash)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return user, nil
+}
+
+const updatePasswordQuery = "UPDATE USERS SET HASH=$1 WHERE EMAIL=$2"
+
+func (p *Postgres) UpdatePassword(user domain.User) error {
+	_, err := p.db.Exec(updatePasswordQuery, user.Hash, user.Email)
+	return err
+}
+
+const getPasswordQuery = "SELECT ID, EMAIL, HASH FROM USERS WHERE EMAIL=$1"
+
+func (p *Postgres) GetPassword(email string) (domain.User, error) {
+	var user domain.User
+
+	err := p.db.QueryRow(getPasswordQuery, email).Scan(&user.ID, &user.Email, &user.Hash)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return user, nil
+}
+
 const createEventQuery = "INSERT INTO EVENTS (NAME, DESCRIPTION, DATE) VALUES ($1, $2, $3) RETURNING ID"
 
 func (p *Postgres) CreateEvent(event domain.Event) (int, error) {

@@ -61,11 +61,13 @@ func main() {
 	// services
 	apiService := app.NewAPI(logger)
 	eventService := app.NewEventService(logger, stg)
+	userService := app.NewUserService(logger, stg)
 
 	// Main API router.
 	mainGroupHandler := handler.NewGroupHandler("/",
 		internalhttp.NewAPIHandler(jsonRenderer, apiService),
 		internalhttp.NewEventHandler(jsonRenderer, *eventService),
+		internalhttp.NewUserHandler(jsonRenderer, *userService),
 	)
 
 	mainHandler := handler.New(handler.MakePublicRoutes(

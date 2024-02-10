@@ -1,8 +1,11 @@
 stages:
-  - testing # Запуск тестов
-  
+  - unit
+  - integration
+  - e2e
+  - bdd
+
 unit-tests:
-  stage: testing
+  stage: unit
   tags:
     - docker
   image: golang:1.21
@@ -12,7 +15,7 @@ unit-tests:
     - make unit-test
 
 integration-tests:
-  stage: testing
+  stage: integration
   tags:
     - docker
   image: golang:1.21
@@ -29,7 +32,7 @@ integration-tests:
     - make integration-test
 
 end-to-end-tests:
-  stage: testing
+  stage: e2e
   tags:
     - docker
   image: golang:1.21
@@ -46,3 +49,22 @@ end-to-end-tests:
   script:
     - make run-api &
     - make e2e-test
+
+bdd-tests:
+  stage: bdd
+  tags:
+    - docker
+  image: golang:1.21
+  services:
+    - postgres:11.7
+  variables:
+    POSTGRES_DB: "postgres"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "7dgvJVDJvh254aqOpfd"
+    POSTGRES_HOST_AUTH_METHOD: trust
+    BACKEND_POSTGRES_HOST: postgres
+  before_script:
+    - go mod download && go mod verify
+  script:
+    - make run-api &
+    - make bdd-test

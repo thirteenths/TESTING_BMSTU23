@@ -27,7 +27,7 @@ type EventServiceTestSuite struct {
 }
 
 func (suite *EventServiceTestSuite) BeforeEach(t provider.T) {
-	t.Epic("Demo")
+	t.Epic("Business Logic")
 	t.Feature("BeforeAfter")
 	t.NewStep("This Step will be before Each")
 

@@ -15,6 +15,10 @@ type Storage interface {
 	CreateEvent(ctx context.Context, event domain.Event) (int, error)
 	DeleteEvent(ctx context.Context, id int) error
 	UpdateEvent(ctx context.Context, event domain.Event, id int) error
+
+	GetUser(ctx context.Context, id int) (domain.User, error)
+	GetPassword(ctx context.Context, email string) (domain.User, error)
+	UpdatePassword(ctx context.Context, user domain.User) error
 }
 
 type storage struct {
@@ -47,4 +51,15 @@ func (s *storage) DeleteEvent(ctx context.Context, id int) error {
 
 func (s *storage) UpdateEvent(ctx context.Context, event domain.Event, id int) error {
 	return s.postgres.UpdateEvent(event, id)
+}
+
+func (s *storage) GetUser(ctx context.Context, id int) (domain.User, error) {
+	return s.postgres.GetUser(id)
+}
+func (s *storage) GetPassword(ctx context.Context, email string) (domain.User, error) {
+	return s.postgres.GetPassword(email)
+}
+
+func (s *storage) UpdatePassword(ctx context.Context, user domain.User) error {
+	return s.postgres.UpdatePassword(user)
 }
